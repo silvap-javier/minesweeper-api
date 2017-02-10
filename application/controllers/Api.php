@@ -52,9 +52,44 @@ class Api extends REST_Controller
         $response = get_default_array_response_json();
         $_POST = json_decode(file_get_contents('php://input'), true);
         $params = $_POST['params']['game'];
-        $matrix = create_matrix($params['col'],$params['row']);
+        
+        $game = array();
+        $game['username'] = $params['username'];
+        $matrix = create_matrix($params['row'],$params['col']);
+        $matrix = create_mines($params['mines'],$matrix);
+        $matrix = create_number_block($matrix,$params['row'],$params['col']);
+
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $game['matrix'] = json_encode($matrix);
+        $game['ip'] = $ip;
+        
+        $this->basic->save('game','id',$game);
+
+        $response['idGame'] = $this->basic->save('game','id',$game);
         $response['data'] = $matrix;
+
         $response['status'] = true;
+        echo json_encode($response);
+    }
+
+    public function game_get($game_id = false){
+        $response = get_default_array_response_json();
+
+        if ($game_id){
+            $response['data'] = $this->basic->get_where('game',array('id' => $game_id));
+            $response['status'] = true;            
+        }else{
+            $ip = $_SERVER['REMOTE_ADDR'];
+            $response['data'] = $this->basic->get_where('game',array('ip' => $ip))->result_array();
+            if (count($response['data']) > 0){
+                $response['data'] = $response['data']['0'];
+                $response['data']['matrix'] = json_decode($response['data']['matrix']);
+                $response['status'] = true;
+            }else{
+                $response['status'] = false;
+            }
+        }
+
         echo json_encode($response);
     }
 
@@ -70,6 +105,7 @@ class Api extends REST_Controller
         $response['status'] = true;
         echo json_encode($response);
     }
+
     public function algo_get(){
         $response = get_default_array_response_json();
         $response['status'] = true;
