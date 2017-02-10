@@ -13,7 +13,7 @@ if (!function_exists('create_matrix')) {
 	    for( $i=1; $i<=$row; $i++ ) {
 	        $matrix[$i] = array();
 	        for( $j=1; $j<=$col; $j++ ) {
-	            $matrix[$i][$j] = array('value' => '0' , 'status' => 'hidden');
+	            $matrix[$i][$j] = array('value' => '0' , 'status' => 'closed' , 'row' => $i , 'col' => $j);
 	        }
 	    }
 	   return $matrix; 

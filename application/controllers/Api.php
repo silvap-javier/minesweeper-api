@@ -54,6 +54,23 @@ class Api extends REST_Controller
         $params = $_POST['params']['game'];
         
         $game = array();
+
+        if (empty($params['row'])){
+            $params['row'] = 8;
+        }
+
+        if (empty($params['col'])){
+            $params['col'] = 8;
+        }
+
+        if (empty($params['username'])){
+            $params['username'] = 'guest';
+        }
+
+        if (empty($params['mines'])){
+            $params['mines'] = 10;
+        }
+
         $game['username'] = $params['username'];
         $matrix = create_matrix($params['row'],$params['col']);
         $matrix = create_mines($params['mines'],$matrix);
@@ -69,6 +86,7 @@ class Api extends REST_Controller
         $response['data'] = $matrix;
 
         $response['status'] = true;
+        
         echo json_encode($response);
     }
 
