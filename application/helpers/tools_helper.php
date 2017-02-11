@@ -23,7 +23,6 @@ if (!function_exists('create_matrix')) {
 if (!function_exists('create_mines')) {
     function create_mines($number_mines,$matrix) {
     	$count_mines = 0;
-    	
     	if ($number_mines == ''){
     		$number_mines = 10;
     	}
