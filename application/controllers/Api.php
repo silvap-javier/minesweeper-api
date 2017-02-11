@@ -36,11 +36,15 @@ class Api extends REST_Controller
         }
 
         if (empty($params['username'])){
-            $params['username'] = 'guest';
+            $params['username'] = 'guest'.'_'.md5(strtotime("now").'guest');
         }
 
         if (empty($params['mines'])){
             $params['mines'] = 10;
+        }
+
+        if (empty($params['time'])){
+            $params['time'] = 0;
         }
 
         $game['username'] = $params['username'];
@@ -51,11 +55,11 @@ class Api extends REST_Controller
         $ip = $_SERVER['REMOTE_ADDR'];
         $game['matrix'] = json_encode($matrix);
         $game['ip'] = $ip;
+        $game['time'] = $params['time'];
         
-        $this->basic->save('game','id',$game);
-
         $response['idGame'] = $this->basic->save('game','id',$game);
         $response['mines'] = $params['mines'];
+        $response['username'] = $params['username'];
         $response['data'] = $matrix;
 
         $response['status'] = true;
@@ -78,6 +82,16 @@ class Api extends REST_Controller
         echo json_encode($response);
     }
 
+    public function games_get($username){
+        $response = get_default_array_response_json();
+         if ($username){
+            $response['data'] = $this->basic->get_where('game',array('username' => $username))->result_array();
+            $response['status'] = false;
+        }
+        $response['status'] = true;
+        echo json_encode($response);
+    }
+
     public function update_game_post(){
         $response = get_default_array_response_json();
         $_POST = json_decode(file_get_contents('php://input'), true);
@@ -86,6 +100,7 @@ class Api extends REST_Controller
         
         $new_game = array();
         $new_game['id'] = $game['id'];
+        $new_game['time'] = $game['time'];
         $new_game['matrix'] = json_encode($matrix);
 
         $this->basic->save('game','id',$new_game);
